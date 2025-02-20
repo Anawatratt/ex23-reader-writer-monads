@@ -1,0 +1,10 @@
+Guess a number between 1 and 50
+Enter your guess: 25
+Too low!
+Enter your guess: 40
+Too high!
+Enter your guess: 30
+Correct!
+
+🎉 Congratulations! You won! 🎉
+Your guesses: [25, 40, 30]
