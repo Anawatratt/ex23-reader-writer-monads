@@ -1,0 +1,56 @@
+import System.Random (randomRIO)
+import Control.Monad (when)
+
+-- ---- Pure Functions ----
+
+checkGuess :: Int -> Int -> String
+checkGuess target guess
+    | guess < target = "Too low!"
+    | guess > target = "Too high!"
+    | otherwise      = "Correct!"
+
+isWithinBounds :: Int -> Int -> Int -> Bool
+isWithinBounds lower upper guess = guess >= lower && guess <= upper
+
+-- ---- Impure Functions ----
+
+getUserGuess :: IO Int
+getUserGuess = do
+    putStr "Enter your guess: "
+    input <- getLine
+    case reads input of
+        [(guess, "")] -> return guess
+        _ -> do
+            putStrLn "Invalid input! Please enter a valid number."
+            getUserGuess  -- Retry if input is invalid
+
+playGame :: Int -> Int -> IO ()
+playGame lowerBound upperBound = do
+    target <- randomRIO (lowerBound, upperBound)  -- Random number in range
+    putStrLn $ "Guess a number between " ++ show lowerBound ++ " and " ++ show upperBound
+    loop target []
+
+  where
+    loop :: Int -> [Int] -> IO ()
+    loop target guesses = do
+        guess <- getUserGuess
+
+        if not (isWithinBounds lowerBound upperBound guess)
+            then do
+                putStrLn $ "Please enter a number between " ++ show lowerBound ++ " and " ++ show upperBound
+                loop target guesses
+            else do
+                let result = checkGuess target guess
+                putStrLn result
+                let newGuesses = guesses ++ [guess]
+
+                if guess == target
+                    then do
+                        putStrLn "\n🎉 Congratulations! You won! 🎉"
+                        putStrLn $ "Your guesses: " ++ show newGuesses
+                    else loop target newGuesses
+
+-- ---- Run the game ----
+
+main :: IO ()
+main = playGame 1 50  -- Set lower and upper bounds (1-50)
